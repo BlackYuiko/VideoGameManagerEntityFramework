@@ -39,6 +39,13 @@
                 <textarea asp-for="Game.Description" class="form-control"></textarea>
                 <span asp-validation-for="Game.Description" class="text-danger"></span>
             </div>
+            <div class="form-group mb-3">
+                <label asp-for="Game.DeveloperId" class="control-label">Developer</label>
+                <select asp-for="Game.DeveloperId" asp-items="Model.DeveloperList" class="form-control">
+                    <option value="">-- Select a Developer --</option>
+                </select>
+                <span asp-validation-for="Game.DeveloperId" class="text-danger"></span>
+            </div>
 
             <div class="form-group">
                 <button type="submit" class="btn btn-primary">Edit Game</button>

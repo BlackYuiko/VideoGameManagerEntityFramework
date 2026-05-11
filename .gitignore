@@ -20,10 +20,6 @@ publish/
 .DS_Store
 Thumbs.db
 
-# ASP.NET Core
-appsettings.Development.json
-appsettings.*.local.json
-
 # Frontend
 node_modules/
 dist/

@@ -1,46 +1,59 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using VideoGameManager.Data;
 using VideoGameManager.Models;
-using VideoGameManager.Services;
 
 namespace VideoGameManager.Pages.Games
 {
     public class EditModel : PageModel
     {
-        private readonly GameService _gameService;
+        public SelectList DeveloperList { get; set; }
+
+
+        private readonly GameStoreContext _context;
 
         [BindProperty]
         public Game? Game { get; set; }
 
-        public EditModel(GameService gameService)
+        public EditModel(GameStoreContext context)
         {
-            _gameService = gameService;
+            _context = context;
         }
 
         // Carregar les dades del joc a editar
-        public IActionResult OnGet(int id)
+        public async Task<IActionResult> OnGetAsync(int id)
         {
-            Game = _gameService.GetById(id);
+            // 2. Le pasamos el 'id' al mÃ©todo FindAsync
+            Game = await _context.Games.FindAsync(id);
 
             if (Game == null)
             {
                 return NotFound();
             }
 
+            var developers = await _context.Developers.ToListAsync();
+            DeveloperList = new SelectList(developers, "Id", "Name");
+
             return Page();
         }
 
         // Rebre les dades modificades
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
             {
+                var developers = await _context.Developers.ToListAsync();
+                DeveloperList = new SelectList(developers, "Id", "Name");
                 return Page();
             }
 
-            // Actualitzem usant el servei (recorda que Game ara conté les dades del formulari)
-            _gameService.Update(Game!);
+            _context.Attach(Game).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
             return RedirectToPage("./Index");
+
         }
     }
 }

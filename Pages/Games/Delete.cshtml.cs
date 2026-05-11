@@ -1,25 +1,27 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using VideoGameManager.Data;
 using VideoGameManager.Models;
-using VideoGameManager.Services;
+
 
 namespace VideoGameManager.Pages.Games
 {
     public class DeleteModel : PageModel
     {
-        private readonly GameService _gameService;
+        private readonly GameStoreContext _context;
 
         public Game? Game { get; set; }
 
-        public DeleteModel(GameService gameService)
+        public DeleteModel(GameStoreContext context)
         {
-            _gameService = gameService;
+            _context = context;
         }
 
         // l'usuari fa clic a "Esborrar" des de la llista
-        public IActionResult OnGet(int id)
+        public async Task<IActionResult> OnGet(int id)
         {
-            Game = _gameService.GetById(id);
+            Game = await _context.Games.Include(g => g.Developer).FirstOrDefaultAsync(x => x.Id == id);
 
             if (Game == null)
             {
@@ -30,13 +32,21 @@ namespace VideoGameManager.Pages.Games
         }
 
         // l'usuari fa clic al botó vermell de confirmació
-        public IActionResult OnPost(int id)
+        public async Task<IActionResult> OnPostAsync(int id)
         {
-            var gameToDelete = _gameService.GetById(id);
+            var gameToDelete = await _context.Games.FindAsync(id);
 
             if (gameToDelete != null)
             {
-                _gameService.Delete(id);
+                try
+                {
+                    _context.Games.Remove(gameToDelete);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateException)
+                {
+                    return RedirectToPage("./Delete", new { id = id, saveChangesError = true });
+                }
             }
 
             return RedirectToPage("./Index");
