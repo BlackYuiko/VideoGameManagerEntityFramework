@@ -1,0 +1,33 @@
+# Build
+[Bb]in/
+[Oo]bj/
+out/
+publish/
+
+# VS
+.vs/
+*.user
+*.suo
+
+# IDEs
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# ASP.NET Core
+appsettings.Development.json
+appsettings.*.local.json
+
+# Frontend
+node_modules/
+dist/
+wwwroot/lib/
+
+# Temp
+*.tmp

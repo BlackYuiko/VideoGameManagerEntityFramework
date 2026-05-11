@@ -1,0 +1,41 @@
+﻿@page
+@model VideoGameManager.Pages.Files.IndexModel
+
+<h2>File Management and Exports</h2>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title">JSON Data</h5>
+        <form method="post" class="mb-3">
+            <button type="submit" asp-page-handler="ExportJson" class="btn btn-primary">Export JSON</button>
+            <button type="submit" asp-page-handler="ImportJson" class="btn btn-warning">Import JSON</button>
+        </form>
+
+        <h5 class="card-title">CSV Data</h5>
+        <form method="post">
+            <button type="submit" asp-page-handler="ExportCsv" class="btn btn-success">Download CSV</button>
+            <button type="submit" asp-page-handler="ImportCsv" class="btn btn-outline-success">Import CSV</button>
+        </form>
+
+        <h5 class="card-title mt-4">Export XML Ranking</h5>
+        <form method="post">
+            <button type="submit" asp-page-handler="ExportXml" class="btn btn-info text-white">Generate ranking.xml</button>
+        </form>
+    </div>
+</div>
+
+<h4>Registre d'Activitat</h4>
+
+<div class="bg-dark text-success p-3 rounded" style="max-height: 400px; overflow-y: auto; font-family: 'Courier New', Courier, monospace;">
+    @if (Model.LogEntries.Length == 0)
+    {
+        <span>[File is Empty]</span>
+    }
+    else
+    {
+        @foreach (var entry in Model.LogEntries)
+        {
+            <div>@entry</div>
+        }
+    }
+</div>

@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<AppConfig>
+  <AppTitle>VideoGame Ranking</AppTitle>
+  <Games>
+    <Game>
+      <id>1</id>
+      <score>10</score>
+      <title>Hola</title>
+      <genre>Hola</genre>
+      <year>2000</year>
+    </Game>
+  </Games>
+</AppConfig>
