@@ -1,130 +1,139 @@
-# VideoGameManager
+# VideoGameManagerEF
 
-Aplicació web desenvolupada amb **ASP.NET Core Razor Pages** per gestionar un catàleg de videojocs. Aquesta pràctica implementa el patró CRUD complet (Create, Read, Update, Delete) i afegeix la capacitat de persistir i exportar la informació en diferents formats de fitxer.
+A web application developed with **ASP.NET Core Razor Pages** to manage a video game catalog, evolving from file-based persistence to a relational database managed with **Entity Framework Core (EF Core)**.
 
-## 🚀 Característiques principals
-* **CRUD Complet:** Llistar, afegir, editar i eliminar videojocs amb validacions de model.
-* **Persistència Automàtica (JSON i CSV):** Els canvis es desen automàticament cada vegada que es crea, modifica o elimina un joc.
-* **Registre d'Activitat (TXT):** Sistema de logs que registra la data, hora i acció realitzada sobre el catàleg.
-* **Exportació i Rànquing (XML):** Generació d'un fitxer XML ordenant els videojocs per puntuació (de major a menor).
-* **Injecció de Dependències:** Ús de Serveis Singleton per mantenir l'estat i gestionar els fitxers de forma centralitzada.
+This version implements a **Code First** approach, where the database schema is automatically generated from C# models, including entity relationships and complex LINQ queries.
+
+## 🚀 Main Features
+
+* **Relational Persistence:** Uses SQL Server to store game and developer data.
+* **Relational Data Model (1:N):** Management of the `Developer` entity and its relationship with `Game`.
+* **Advanced Statistics & Queries (LINQ):**
+  * Combined search by title, genre, and minimum year.
+  * Average score calculations per developer.
+  * Game distribution by decades.
+  * "Productive Developers" filtering based on a dynamic game count threshold.
+* **Referential Integrity:** Blocks the deletion of developers that have associated games to maintain database consistency.
+* **Integrated Creation:** Ability to create a new `Developer` directly from the `Game` creation form.
 
 ---
 
-## 📂 Estructura del Projecte
+## 📂 Project Structure
 
-**Nota important sobre els fitxers de dades:** Tot i que la proposta inicial suggeria guardar les dades a `wwwroot/data/`, s'ha implementat la carpeta `Data/` a l'arrel del projecte (usant `ContentRootPath`). Això garanteix que l'aplicació tingui sempre permisos d'escriptura correctes independentment de l'entorn de desenvolupament, evitant la pèrdua de dades per reinicis del servidor.
+The project follows a clean architecture where the `DbContext` acts as the central hub for SQL Server communication.
 
-~~~text
-VideoGameManager/
+```text
+VideoGameManagerEF/
 ├── Models/
-│   └── Game.cs                  # Model de dades amb DataAnnotations
-├── Services/
-│   ├── GameService.cs           # Lògica central i gestió de memòria/auto-save
-│   ├── GameRepository.cs        # Persistència principal (JSON)
-│   ├── GamesExporter.cs         # Exportació i importació (CSV)
-│   └── RankingExporter.cs       # Generació del rànquing (XML)
+│   ├── Game.cs                # Game entity with FK to Developer
+│   └── Developer.cs           # Studio entity (1:N relationship with Games)
+├── Data/
+│   ├── GameStoreContext.cs    # Entity Framework Core DbContext
+│   └── Migrations/            # Database schema history
 ├── Pages/
-│   ├── Games/
-│   │   ├── Index.cshtml         # Llista de jocs
-│   │   ├── Details.cshtml       # Veure detalls
-│   │   ├── Create.cshtml        # Formulari d'alta
-│   │   ├── Edit.cshtml          # Formulari d'edició
-│   │   └── Delete.cshtml        # Confirmació d'eliminació
-│   ├── Files/                   
-│   │   └── Index.cshtml         # Gestió, visualització de logs i exportacions
+│   ├── Games/                 # Full CRUD for video games
+│   ├── Developers/            # Studio management and associated games view
+│   ├── Stats/                 # Advanced statistics and search dashboard
 │   └── Shared/
-│       └── _Layout.cshtml       # Plantilla principal
-├── Data/                        # 📁 FITXERS DE DADES (Es crea automàticament)
-│   ├── activity_log.txt         # Log d'accions
-│   ├── games.json               # Base de dades JSON
-│   ├── games.csv                # Dades exportades a CSV
-│   └── ranking.xml              # Rànquing XML
-└── Program.cs                   # Configuració de l'App i injecció de Singletons
-~~~
+│       └── _Layout.cshtml     # Main layout template
+├── appsettings.json           # ConnectionString configuration
+└── Program.cs                 # DbContext service and DI configuration
+```
 
 ---
 
-## ⚙️ Instruccions d'execució
+## ⚙️ Execution Instructions
 
-### Requisits previs
-* [.NET 8.0 SDK](https://dotnet.microsoft.com/download) (o superior) instal·lat.
-* Visual Studio 2022 o Visual Studio Code.
+### Prerequisites
 
-### Com executar l'aplicació
-1. **Clonar o descarregar** el projecte al teu ordinador.
-2. Obre un terminal o línia de comandes a la carpeta arrel del projecte (on es troba el fitxer `VideoGameManager.csproj`).
-3. Construeix el projecte per assegurar que no hi ha errors executant:
-   ~~~bash
-   dotnet build
-   ~~~
-4. Executa l'aplicació:
-   ~~~bash
+* **[.NET 10.0 SDK](https://dotnet.microsoft.com/download)** (Required for current NuGet package compatibility).
+* **Visual Studio 2026 Insider Edition** (The project requires the latest IDE features for deployment).
+* **SQL Server** (LocalDB or Express) running locally.
+* EF Core Global Tool:
+  ```bash
+  dotnet tool install --global dotnet-ef
+  ```
+
+### Setup and Launch
+
+1. **Configure the Database:**
+
+   Open `appsettings.json` and adjust the `DefaultConnection` according to your local server instance:
+
+   ```json
+   "ConnectionStrings": {
+     "DefaultConnection": "Server=localhost;Database=VideoGameManagerDB;Trusted_Connection=True;TrustServerCertificate=True;"
+   }
+   ```
+
+2. **Apply Migrations:**
+
+   Run the following command in the terminal to create the tables automatically:
+
+   ```bash
+   dotnet ef database update
+   ```
+
+3. **Run the Application:**
+
+   Press **F5** in Visual Studio 2026 Insider or run via terminal:
+
+   ```bash
    dotnet run
-   ~~~
-5. Obre el teu navegador web i ves a la URL que indica la consola (generalment `http://localhost:5000` o `https://localhost:5001`).
-
-*Nota per a Visual Studio:* Si fas servir Visual Studio 2022, només has de prémer el botó **"Run" (F5)**. Per veure la carpeta `Data/` i els seus fitxers a l'Explorador de Solucions un cop l'app ha creat el primer joc, recorda fer clic a l'opció **"Mostra tots els fitxers"** (Show All Files).
+   ```
 
 ---
 
-## 📄 Exemples de fitxers de dades
+## 📊 Implemented LINQ Queries
 
-L'aplicació genera i llegeix els següents formats. Els fitxers es creen automàticament a la carpeta `/Data` quan s'afegeix el primer joc a la web.
+The system leverages the LINQ to Entities engine to perform operations directly on the database.
 
-### 1. JSON (`Data/games.json`)
-S'utilitza com a persistència principal de l'aplicació. Es llegeix a l'inici i es desa amb cada canvi.
-~~~json
-[
-  {
-    "Id": 1,
-    "Title": "The Legend of Zelda: TotK",
-    "Genre": "Adventure",
-    "Year": 2023,
-    "Score": 9.8,
-    "Description": "Open-world action RPG"
-  }
-]
-~~~
+### 1. Combined Search (Task 7.2)
 
-### 2. CSV (`Data/games.csv`)
-S'actualitza automàticament al mateix temps que el JSON. Manté les dades separades per comes per permetre una ràpida importació a Excel o altres eines.
-~~~csv
-Id,Title,Genre,Year,Score
-1,The Legend of Zelda: TotK,Adventure,2023,9.8
-2,Elden Ring,RPG,2022,9.5
-~~~
+Allows filtering games simultaneously by multiple criteria (case-insensitive):
 
-### 3. XML (`Data/ranking.xml`)
-S'exporta només sota demanda des de la vista `/Files`. Ordena els jocs per puntuació descendent (usant LINQ) i inclou només les dades sol·licitades.
-~~~xml
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<AppConfig>
-  <AppTitle>VideoGame Ranking</AppTitle>
-  <Games>
-    <Game>
-      <id>1</id>
-      <score>9.8</score>
-      <title>The Legend of Zelda: TotK</title>
-      <genre>Adventure</genre>
-      <year>2023</year>
-    </Game>
-    <Game>
-      <id>2</id>
-      <score>9.5</score>
-      <title>Elden Ring</title>
-      <genre>RPG</genre>
-      <year>2022</year>
-    </Game>
-  </Games>
-</AppConfig>
-~~~
+```csharp
+var query = _context.Games
+    .Include(g => g.Developer)
+    .AsQueryable();
 
-### 4. Text Pla / Log (`Data/activity_log.txt`)
-Registra cada operació en mode Append (afegeix al final sense sobreescriure). Aquest fitxer es llegeix i es mostra directament a la pàgina de fitxers.
-~~~text
-[03/05/2026 10:15:30] [CREATE] The Legend of Zelda: TotK
-[03/05/2026 10:18:45] [CREATE] Elden Ring
-[03/05/2026 10:20:12] [UPDATE] Elden Ring
-[03/05/2026 10:25:00] [DELETE] FIFA 23
-~~~
+if (!string.IsNullOrEmpty(titleFilter))
+    query = query.Where(g => g.Title.Contains(titleFilter));
+
+if (!string.IsNullOrEmpty(genreFilter))
+    query = query.Where(g => g.Genre == genreFilter);
+```
+
+### 2. Performance Ranking (Task 7.1)
+
+Dynamic calculation of the average quality score for each studio:
+
+```csharp
+var avgByDev = await _context.Developers
+    .Where(d => d.Games.Any())
+    .Select(d => new DeveloperStat {
+        Name = d.Name,
+        AvgScore = d.Games.Average(g => g.Score)
+    })
+    .ToListAsync();
+```
+
+### 3. Data Integrity (Task 8.3)
+
+Before deleting a developer, the system verifies dependencies to prevent foreign key constraint errors:
+
+```csharp
+if (developer.Games.Any()) {
+    ModelState.AddModelError("", "Cannot delete a studio that has associated games.");
+}
+```
+
+---
+
+## 🛠️ Technologies Used
+
+* ASP.NET Core 10 Razor Pages - Presentation framework.
+* Entity Framework Core - ORM for data management.
+* LINQ - Query language for filtering and statistics.
+* Bootstrap 5 - UI design and responsiveness.
+* SQL Server - Relational database engine.
