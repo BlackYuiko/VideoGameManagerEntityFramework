@@ -13,10 +13,17 @@ namespace VideoGameManager.Pages.Games
 
         private readonly GameStoreContext _context;
 
-        // [BindProperty] indica que la propietat Game s'ha de poblar
-        // automàticament amb les dades del formulari quan arriba el POST.
         [BindProperty]
         public Game Game { get; set; } = new Game();
+
+        [BindProperty]
+        public string? NewDeveloperName { get; set; }
+
+        [BindProperty]
+        public string? NewDeveloperCountry { get; set; }
+
+        [BindProperty]
+        public int? NewDeveloperFoundedYear { get; set; }
 
         public CreateModel(GameStoreContext context)
         {
@@ -25,25 +32,48 @@ namespace VideoGameManager.Pages.Games
 
         public async Task<IActionResult> OnGetAsync()
         {
-            var developersList = await _context.Developers.ToListAsync();
-            DeveloperList = new SelectList(developersList, "Id", "Name");
+            await LoadDevelopersAsync();
             return Page();
         }
 
-        // Rebre les dades quan l'usuari fa clic a "Guardar"
         public async Task<IActionResult> OnPost()
         {
-            if(!ModelState.IsValid)
-{
-                var developers = await _context.Developers.ToListAsync();
-                DeveloperList = new SelectList(developers, "Id", "Name");
+            if (!string.IsNullOrWhiteSpace(NewDeveloperName))
+            {
+                ModelState.Remove("Game.DeveloperId");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                await LoadDevelopersAsync();
                 return Page();
+            }
+
+            if (!string.IsNullOrWhiteSpace(NewDeveloperName))
+            {
+                var newDev = new Developer 
+                { 
+                    Name = NewDeveloperName,
+                    Country = NewDeveloperCountry,
+                    FoundedYear = NewDeveloperFoundedYear ?? 0
+                };
+                _context.Developers.Add(newDev);
+                await _context.SaveChangesAsync();
+
+                Game.DeveloperId = newDev.Id;
             }
 
             _context.Games.Add(Game);
             await _context.SaveChangesAsync();
 
             return RedirectToPage("./Index");
+        }
+
+        private async Task LoadDevelopersAsync()
+        {
+            var developers = await _context.Developers.ToListAsync();
+            DeveloperList = new SelectList(developers, "Id", "Name");
+
         }
     }
 }

@@ -15,7 +15,7 @@
         <dd class="col-sm-10">@Model.Developer.Country</dd>
 
         <dt class="col-sm-2">Foundation year</dt>
-        <dd class="col-sm-10">@Model.Developer.FoundedYear / 10</dd>
+        <dd class="col-sm-10">@Model.Developer.FoundedYear</dd>
 
         <dt class="col-sm-2">Games Library</dt>
         @if (Model.Developer?.Games != null && Model.Developer.Games.Any())
@@ -30,11 +30,10 @@
         }
         else
         {
-            <p style="color: #999; font-style: italic; font-size: 14px;">No games registered for this developer.</p>
+            <p> No games registered for this developer.</p>
         }
     </dl>
 </div>
 <div>
     <a asp-page="./Index" class="btn btn-secondary">Come Back</a>
-    <a asp-page="./Delete" class="btn btn-danger">Delete developer</a>
 </div>

@@ -13,6 +13,7 @@
             <th>Country</th>
             <th>Founded year</th>
             <th>Number of games</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -25,6 +26,7 @@
                 <td>@developer.Games.Count</td>
                 <td>
                     <a asp-page="./Details" asp-route-id="@developer.Id" class="btn btn-info btn-sm">Details</a>
+                    <a asp-page="./Delete" asp-route-id="@developer.Id" class="btn btn-danger btn-sm">Delete</a>
                 </td>
             </tr>
         }
