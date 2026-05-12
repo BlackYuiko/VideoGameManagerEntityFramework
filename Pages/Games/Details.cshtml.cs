@@ -1,24 +1,26 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using VideoGameManager.Data;
 using VideoGameManager.Models;
-using VideoGameManager.Services;
+
 
 namespace VideoGameManager.Pages.Games
 {
     public class DetailsModel : PageModel
     {
-        private readonly GameService _gameService;
+        private readonly GameStoreContext _context;
 
         public Game? Game { get; set; }
 
-        public DetailsModel(GameService gameService)
+        public DetailsModel(GameStoreContext context)
         {
-            _gameService = gameService;
+            _context = context;
         }
 
-        public IActionResult OnGet(int id)
+        public async Task<IActionResult> OnGet(int id)
         {
-            Game = _gameService.GetById(id);
+            Game = await _context.Games.Include(g => g.Developer).FirstOrDefaultAsync(x => x.Id == id);
 
             if (Game == null)
             {

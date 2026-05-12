@@ -32,6 +32,35 @@
                 <span asp-validation-for="Game.Score" class="text-danger"></span>
             </div>
 
+            <div class="card mb-3 border-primary bg-light">
+                <div class="card-header bg-primary text-white">Developer Information</div>
+                <div class="card-body">
+                    <div class="form-group mb-3">
+                        <label asp-for="Game.DeveloperId" class="control-label"><strong>Option A:</strong> Select Existing</label>
+                        <select asp-for="Game.DeveloperId" asp-items="Model.DeveloperList" class="form-control">
+                            <option value="">-- Choose Developer --</option>
+                        </select>
+                    </div>
+
+                    <div class="text-center my-3"><span class="badge bg-secondary">OR</span></div>
+
+                    <div class="form-group">
+                        <label class="control-label"><strong>Option B:</strong> Create New Developer</label>
+                        <div class="row g-2">
+                            <div class="col-md-12 mb-2">
+                                <input asp-for="NewDeveloperName" class="form-control" placeholder="Name of the studio" />
+                            </div>
+                            <div class="col-md-6">
+                                <input asp-for="NewDeveloperCountry" class="form-control" placeholder="Country" />
+                            </div>
+                            <div class="col-md-6">
+                                <input asp-for="NewDeveloperFoundedYear" class="form-control" placeholder="Founded Year" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="form-group mb-3">
                 <label asp-for="Game.Description" class="control-label">Description</label>
                 <textarea asp-for="Game.Description" class="form-control"></textarea>

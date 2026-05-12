@@ -1,13 +1,14 @@
-using VideoGameManager.Services;
+using VideoGameManager.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
-builder.Services.AddSingleton<GameService>();
-builder.Services.AddSingleton<GameRepository>();
-builder.Services.AddSingleton<GamesExporter>();
-builder.Services.AddSingleton<RankingExporter>();
+
+builder.Services.AddDbContext<VideoGameManager.Data.GameStoreContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 
 var app = builder.Build();
 
@@ -24,6 +25,12 @@ app.UseHttpsRedirection();
 app.UseRouting();
 
 app.UseAuthorization();
+
+app.MapGet("/", context =>
+{
+    context.Response.Redirect("/Games/Index");
+    return Task.CompletedTask;
+});
 
 app.MapStaticAssets();
 app.MapRazorPages()
